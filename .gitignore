@@ -1,0 +1,8 @@
+build/
+dist/
+ui/bin/
+ui/obj/
+tests/*-result.txt
+tests/e2e-run.log
+.vs/
+*.user

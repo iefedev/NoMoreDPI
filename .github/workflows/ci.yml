@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Inno Setup
+        shell: pwsh
+        run: choco install innosetup --version 6.7.1 -y --no-progress --allow-downgrade
+      - name: Vendored binaries match upstream
+        shell: pwsh
+        run: ./tools/verify-third-party.ps1
+      - name: Vet and test
+        shell: pwsh
+        run: |
+          go vet ./...
+          go vet -tags debug ./...
+          go test ./cmd/nomoredpi/ ./internal/config/ ./internal/engine/ ./internal/ipc/
+      - name: ciadpi builds from the vendored source
+        shell: pwsh
+        run: |
+          if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) { choco install mingw -y --no-progress; $env:Path = "C:\ProgramData\mingw64\mingw64\bin;$env:Path" }
+          ./tools/build-ciadpi.ps1 -Out "$env:RUNNER_TEMP\ciadpi-from-source.exe"
+      - name: Build
+        shell: pwsh
+        run: ./build.ps1 -Version "1.0.0-ci.${{ github.run_number }}" -ProjectUrl "${{ github.server_url }}/${{ github.repository }}" -Installer
+      - uses: actions/upload-artifact@v4
+        with:
+          name: setup
+          path: dist/*-setup.exe*
+          retention-days: 7

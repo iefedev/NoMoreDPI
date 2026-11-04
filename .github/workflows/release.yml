@@ -1,0 +1,49 @@
+name: Release
+
+# Push a tag like v1.2.3 (or v1.2.3-beta.1). The setup and its SHA-256 file go into a draft
+# release; publish it by hand on GitHub after checking it.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Inno Setup
+        shell: pwsh
+        run: choco install innosetup --version 6.7.1 -y --no-progress --allow-downgrade
+      - name: Vendored binaries match upstream
+        shell: pwsh
+        run: ./tools/verify-third-party.ps1
+      - name: Test
+        shell: pwsh
+        run: |
+          go vet ./...
+          go test ./cmd/nomoredpi/ ./internal/config/ ./internal/engine/ ./internal/ipc/
+      - name: Build
+        shell: pwsh
+        run: |
+          $v = '${{ github.ref_name }}'.TrimStart('v')
+          ./build.ps1 -Version $v -ProjectUrl "${{ github.server_url }}/${{ github.repository }}" -Installer
+      - name: Draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $v = $tag.TrimStart('v')
+          $sha = (Get-Content "dist/NoMoreDPI-$v-setup.exe.sha256").Split(' ')[0]
+          $notes = "Changes are listed in CHANGELOG.md in the repository.`n`nWindows 10/11 x64. Download **NoMoreDPI-$v-setup.exe** and run it. Windows SmartScreen may warn because the installer is not code-signed: choose *More info* → *Run anyway*.`n`nSHA-256: ``$sha``"
+          $pre = if ($tag -match '-') { '--prerelease' } else { $null }
+          gh release create $tag (Get-ChildItem dist -Filter '*-setup.exe*').FullName --draft --verify-tag --title "No More DPI $v" --notes $notes $pre

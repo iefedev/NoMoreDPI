@@ -1,0 +1,115 @@
+<Page x:Class="NoMoreDPI.Pages.ProfilesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:NoMoreDPI"
+      Title="Profiles" ScrollViewer.CanContentScroll="False">
+  <Page.Resources>
+    <local:StateBrushConverter x:Key="StateBrush" />
+    <local:VisibleConverter x:Key="Visible" />
+    <local:NotConverter x:Key="Not" />
+    <Style x:Key="Label" TargetType="ui:TextBlock">
+      <Setter Property="FontTypography" Value="Caption" />
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+      <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+  </Page.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="32,16,32,32" MaxWidth="1000">
+      <ui:TextBlock FontTypography="Title" Text="Profiles" Margin="0,0,0,4" />
+      <ui:TextBlock FontTypography="Body" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,20" TextWrapping="Wrap"
+                    Text="Each profile gets a list of domains past DPI with its own byedpi setting. Subdomains are included; traffic to anything not on a list goes out directly." />
+
+      <ui:InfoBar Title="Could not read the settings" Message="{Binding ConfigError}" Severity="Warning" IsClosable="False"
+                  IsOpen="{Binding ConfigError, Converter={StaticResource Visible}}" Margin="0,0,0,12" />
+
+      <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+        <ui:Button Content="New profile" Appearance="Primary" Click="Add_Click">
+          <ui:Button.Icon><ui:SymbolIcon Symbol="Add24" /></ui:Button.Icon>
+        </ui:Button>
+      </StackPanel>
+
+      <ui:TextBlock FontTypography="Body" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12"
+                    Visibility="{Binding Config.Profiles.Count, Converter={StaticResource Visible}, ConverterParameter=invert, FallbackValue=Collapsed}"
+                    Text="No profiles yet. Click New profile, give it a name and list the domains of a site your network blocks, one per line. If the site still doesn't open, click Auto-find on the profile." />
+
+      <ItemsControl ItemsSource="{Binding Config.Profiles}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <ui:CardExpander Margin="0,0,0,4">
+              <ui:CardExpander.Icon><ui:SymbolIcon Symbol="Globe24" /></ui:CardExpander.Icon>
+              <ui:CardExpander.Header>
+                <DockPanel>
+                  <ui:ToggleSwitch DockPanel.Dock="Right" Margin="12,0,16,0" IsChecked="{Binding Enabled}" ToolTip="Turn the profile on or off" />
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center"
+                               Fill="{Binding State, Converter={StaticResource StateBrush}}" />
+                      <ui:TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                    <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  TextWrapping="Wrap" Text="{Binding StatsText}" />
+                  </StackPanel>
+                </DockPanel>
+              </ui:CardExpander.Header>
+
+              <StackPanel>
+                <ui:TextBlock Style="{StaticResource Label}" Margin="0,0,0,4" Text="Name" />
+                <ui:TextBox PlaceholderText="Profile name" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ui:TextBlock Style="{StaticResource Label}" Text="Domains (one per line)" />
+                <ui:TextBox AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="96" MaxHeight="240"
+                            VerticalScrollBarVisibility="Auto" FontFamily="Cascadia Mono, Consolas"
+                            Text="{Binding DomainsText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ui:TextBlock Style="{StaticResource Label}" Text="{Binding PortLabel}" />
+                <ui:TextBox FontFamily="Cascadia Mono, Consolas"
+                            Text="{Binding Args, UpdateSourceTrigger=PropertyChanged}" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                  <ui:Button Content="Auto-find" Click="Find_Click" Margin="0,0,8,0"
+                             ToolTip="Try known byedpi settings over your current connection and keep the first one that works"
+                             IsEnabled="{Binding DataContext.AnyFinding, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource Not}}">
+                    <ui:Button.Icon><ui:SymbolIcon Symbol="Search24" /></ui:Button.Icon>
+                  </ui:Button>
+                  <ui:Button Content="Delete" Click="Delete_Click">
+                    <ui:Button.Icon><ui:SymbolIcon Symbol="Delete24" /></ui:Button.Icon>
+                  </ui:Button>
+                </StackPanel>
+
+                <!-- Auto find -->
+                <StackPanel Orientation="Horizontal" Margin="0,12,0,0"
+                            Visibility="{Binding Finding, Converter={StaticResource Visible}}">
+                  <ui:ProgressRing IsIndeterminate="True" Width="18" Height="18" Margin="0,0,10,0" />
+                  <ui:TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Trying strategies, this can take about a minute…" />
+                </StackPanel>
+                <StackPanel Margin="0,12,0,0" Visibility="{Binding HasFind, Converter={StaticResource Visible}}">
+                  <ui:TextBlock FontTypography="BodyStrong" TextWrapping="Wrap" Text="{Binding FindHeadline}" />
+                  <ItemsControl ItemsSource="{Binding Find.Attempts}" Margin="0,6,0,0">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid Margin="0,2">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="2*" />
+                          </Grid.ColumnDefinitions>
+                          <ui:TextBlock Text="{Binding Mark}" />
+                          <ui:TextBlock Grid.Column="1" FontFamily="Cascadia Mono, Consolas" Text="{Binding Args}" TextTrimming="CharacterEllipsis" />
+                          <ui:TextBlock Grid.Column="2" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Ms, StringFormat={}{0} ms}" />
+                          <ui:TextBlock Grid.Column="3" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Err}" TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </StackPanel>
+            </ui:CardExpander>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

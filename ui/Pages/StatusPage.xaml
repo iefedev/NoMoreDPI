@@ -1,0 +1,102 @@
+<Page x:Class="NoMoreDPI.Pages.StatusPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:NoMoreDPI"
+      Title="Status" ScrollViewer.CanContentScroll="False">
+  <Page.Resources>
+    <local:StateBrushConverter x:Key="StateBrush" />
+  </Page.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="32,16,32,32" MaxWidth="1000">
+      <ui:TextBlock FontTypography="Title" Text="Status" Margin="0,0,0,20" />
+
+      <ui:InfoBar x:Name="Problem" Severity="Error" IsClosable="False" Margin="0,0,0,12" />
+      <ui:InfoBar x:Name="Tip" Severity="Informational" IsClosable="True" Margin="0,0,0,12"
+                  Title="Sites still blocked?"
+                  Message="Open Profiles and run Auto-find on that profile. It tries byedpi settings over your current connection and keeps the first one that works. Run it again when you switch networks." />
+
+      <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+              CornerRadius="8" Padding="24">
+        <DockPanel>
+          <ui:Button x:Name="Toggle" DockPanel.Dock="Right" VerticalAlignment="Center" MinWidth="120" Click="Toggle_Click" />
+          <ui:SymbolIcon Symbol="ShieldGlobe24" FontSize="40" Margin="0,0,20,0" VerticalAlignment="Center"
+                         Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+          <StackPanel VerticalAlignment="Center">
+            <ui:TextBlock FontTypography="Subtitle" Text="No More DPI" />
+            <ui:TextBlock x:Name="Detail" FontTypography="Caption" Margin="0,2,0,10" TextWrapping="Wrap"
+                          Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <StackPanel Orientation="Horizontal">
+              <Ellipse x:Name="Dot" Width="8" Height="8" Margin="0,0,8,0" Fill="Gray" />
+              <ui:TextBlock x:Name="Headline" Text="Connecting…" />
+            </StackPanel>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="Profiles" Margin="0,24,0,8" />
+      <ItemsControl ItemsSource="{Binding Config.Profiles}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <ui:CardAction Margin="0,0,0,4" Click="Profile_Click">
+              <ui:CardAction.Icon><ui:SymbolIcon Symbol="Globe24" /></ui:CardAction.Icon>
+              <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                  <Ellipse Width="8" Height="8" Margin="0,0,0,0" Fill="{Binding State, Converter={StaticResource StateBrush}}" />
+                </StackPanel>
+                <StackPanel>
+                  <ui:TextBlock FontTypography="Body" Text="{Binding Name}" />
+                  <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="{Binding StatsText}" TextWrapping="Wrap" />
+                </StackPanel>
+              </DockPanel>
+            </ui:CardAction>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="DNS" Margin="0,24,0,8" />
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="Search24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Queries" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="DNS queries answered by the service" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:TextBlock x:Name="DnsQueries" FontTypography="BodyStrong" Text="—" />
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="ArrowSwap24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Routed" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Queries for profile domains that got a fake address" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:TextBlock x:Name="DnsFaked" FontTypography="BodyStrong" Text="—" />
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="ShieldDismiss24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Blocked DoH" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Browsers' own encrypted DNS requests" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:TextBlock x:Name="DnsBlocked" FontTypography="BodyStrong" Text="—" />
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="LockClosed24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="DNS lock" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Turned on and off on the Advanced page" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:TextBlock x:Name="DnsLock" FontTypography="BodyStrong" Text="—" />
+      </ui:CardControl>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

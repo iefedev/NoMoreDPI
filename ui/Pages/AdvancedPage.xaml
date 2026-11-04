@@ -1,0 +1,60 @@
+<Page x:Class="NoMoreDPI.Pages.AdvancedPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:NoMoreDPI"
+      Title="Advanced" ScrollViewer.CanContentScroll="False">
+  <Page.Resources>
+    <local:VisibleConverter x:Key="Visible" />
+  </Page.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="32,16,32,32" MaxWidth="1000">
+      <ui:TextBlock FontTypography="Title" Text="Advanced" Margin="0,0,0,4" />
+      <ui:TextBlock FontTypography="Body" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,20" TextWrapping="Wrap"
+                    Text="The DNS side of the service. These settings apply to every user of this PC, so saving a change here asks for administrator permission and reconfigures the service." />
+
+      <ui:InfoBar Title="Could not read the settings" Message="{Binding ConfigError}" Severity="Warning" IsClosable="False"
+                  IsOpen="{Binding ConfigError, Converter={StaticResource Visible}}" Margin="0,0,0,12" />
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="DNS" Margin="0,0,0,8" />
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="LockClosed24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="DNS lock" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="Blocks other DNS servers and known DNS-over-HTTPS servers so every app asks No More DPI. While it is on, browsers turn off their own secure DNS through a policy and show &quot;Managed by your organization&quot;; this is removed again when you pause or uninstall." />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:ToggleSwitch IsChecked="{Binding Config.LockDns}" />
+      </ui:CardControl>
+
+      <ui:CardExpander Margin="0,0,0,4" IsExpanded="True">
+        <ui:CardExpander.Icon><ui:SymbolIcon Symbol="Server24" /></ui:CardExpander.Icon>
+        <ui:CardExpander.Header>
+          <StackPanel>
+            <ui:TextBlock Text="DNS servers" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="DNSCrypt stamps (sdns://) or DoH URLs (https://), one per line; tried in order" />
+          </StackPanel>
+        </ui:CardExpander.Header>
+        <ui:TextBox AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="96" MaxHeight="260"
+                    VerticalScrollBarVisibility="Auto" FontFamily="Cascadia Mono, Consolas"
+                    Text="{Binding Config.UpstreamsText, UpdateSourceTrigger=PropertyChanged}" />
+      </ui:CardExpander>
+
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="Router24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Fake IP range" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="Profile domains get addresses from this block and reach byedpi through the tunnel. A /16 to /24 block inside 100.64.0.0/10 or 198.18.0.0/15" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:TextBox Width="220" FontFamily="Cascadia Mono, Consolas"
+                    Text="{Binding Config.FakeRange, UpdateSourceTrigger=PropertyChanged}" />
+      </ui:CardControl>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

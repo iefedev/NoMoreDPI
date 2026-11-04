@@ -1,0 +1,21 @@
+{
+  "_comment": "Pins for the vendored binaries. build.ps1 checks sha256 of each file before using it; tools/verify-third-party.ps1 (run in CI) downloads each archive, checks archiveSha256 and compares the member inside it byte for byte with the vendored file. See third_party/README.md.",
+  "binaries": [
+    {
+      "name": "byedpi 0.17.3 (ciadpi.exe, x86_64)",
+      "file": "byedpi-bin/ciadpi.exe",
+      "sha256": "eb53ceeeb981cc6735ac24bb1e51e725280b86630e80fdf19ddc4ee4a5b54ef4",
+      "archive": "https://github.com/hufrea/byedpi/releases/download/v0.17.3/byedpi-17.3-x86_64-w64.zip",
+      "archiveSha256": "70d2c94147193cb915f9c6eb5144b8d404dacbcfa90bda2383b6b211afafa456",
+      "member": "ciadpi.exe"
+    },
+    {
+      "name": "Wintun 0.14.1 (wintun.dll, amd64)",
+      "file": "wintun/wintun.dll",
+      "sha256": "e5da8447dc2c320edc0fc52fa01885c103de8c118481f683643cacc3220dafce",
+      "archive": "https://www.wintun.net/builds/wintun-0.14.1.zip",
+      "archiveSha256": "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51",
+      "member": "wintun/bin/amd64/wintun.dll"
+    }
+  ]
+}

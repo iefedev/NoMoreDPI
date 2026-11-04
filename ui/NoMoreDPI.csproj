@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Tray icon + settings window (WPF + Wpf.Ui). Talks to the nomoredpi service over the
+       \\.\pipe\nomoredpi named pipe; build.ps1 publishes it self-contained into dist\. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>NoMoreDPI</AssemblyName>
+    <RootNamespace>NoMoreDPI</RootNamespace>
+    <Product>No More DPI</Product>
+    <AssemblyTitle>No More DPI</AssemblyTitle>
+    <Authors>iefedev</Authors>
+    <Company>iefedev</Company>
+    <Copyright>Copyright (c) 2026 iefedev</Copyright>
+    <!-- build.ps1 passes -p:Version=x.y.z from the release tag. -->
+    <Version>1.0.0</Version>
+    <ApplicationIcon>..\assets\icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- WinForms is only here for NotifyIcon; its high-DPI advice is for WinForms apps. -->
+    <NoWarn>$(NoWarn);WFAC010;WFO0003</NoWarn>
+    <!-- No build-machine paths in the binaries: source paths are recorded as /_/... -->
+    <Deterministic>true</Deterministic>
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))=/_/</PathMap>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(_IsPublishing)' == 'true'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <!-- Link behind the "Project page" button in Settings. build.ps1 -ProjectUrl passes it
+       (CI uses the repository URL); without it the button is hidden. -->
+  <ItemGroup>
+    <AssemblyMetadata Include="ProjectUrl" Value="$(ProjectUrl)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.14" />
+  </ItemGroup>
+
+</Project>

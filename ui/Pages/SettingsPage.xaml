@@ -1,0 +1,114 @@
+<Page x:Class="NoMoreDPI.Pages.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      Title="Settings" ScrollViewer.CanContentScroll="False">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="32,16,32,32" MaxWidth="1000">
+      <ui:TextBlock FontTypography="Title" Text="Settings" Margin="0,0,0,20" />
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="Service" Margin="0,0,0,8" />
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="ServerPlay20" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <Ellipse x:Name="ServiceDot" Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center" Fill="Gray" />
+              <ui:TextBlock x:Name="ServiceStateText" Text="—" />
+            </StackPanel>
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="The background service does the work: DNS, the tunnel and byedpi. The tray icon and this window only control it." />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <StackPanel Orientation="Horizontal">
+          <ui:Button x:Name="StartButton" Content="Start" Margin="0,0,8,0" Click="Start_Click">
+            <ui:Button.Icon><ui:SymbolIcon Symbol="Play24" /></ui:Button.Icon>
+          </ui:Button>
+          <ui:Button x:Name="StopButton" Content="Stop" Margin="0,0,8,0" Click="Stop_Click">
+            <ui:Button.Icon><ui:SymbolIcon Symbol="Stop24" /></ui:Button.Icon>
+          </ui:Button>
+          <ui:Button x:Name="RestartButton" Content="Restart" Click="Restart_Click">
+            <ui:Button.Icon><ui:SymbolIcon Symbol="ArrowClockwise24" /></ui:Button.Icon>
+          </ui:Button>
+        </StackPanel>
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="Flash24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Startup type" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="Automatic starts the service with Windows, before anyone signs in. Manual waits for you to start it here. Disabled keeps it off. Changing this asks for administrator permission." />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ComboBox x:Name="StartupBox" MinWidth="160" SelectionChanged="Startup_Changed">
+          <ComboBoxItem Content="Automatic" Tag="Automatic" />
+          <ComboBoxItem Content="Manual" Tag="Manual" />
+          <ComboBoxItem Content="Disabled" Tag="Disabled" />
+        </ComboBox>
+      </ui:CardControl>
+      <ui:CardAction Margin="0,0,0,4" Click="OpenLogs_Click">
+        <ui:CardAction.Icon><ui:SymbolIcon Symbol="DocumentText24" /></ui:CardAction.Icon>
+        <StackPanel>
+          <ui:TextBlock Text="Open the log folder" />
+          <ui:TextBlock x:Name="LogDirText" FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+      </ui:CardAction>
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="App" Margin="0,24,0,8" />
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="Power24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Start with Windows" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="Puts the tray icon in the notification area when you sign in, without opening this window. The service runs either way." />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:ToggleSwitch x:Name="AutostartSwitch" Checked="Autostart_Changed" Unchecked="Autostart_Changed" />
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="ArrowMinimize24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="Close to tray" />
+            <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                          Text="When off, closing this window also closes the tray icon" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:ToggleSwitch x:Name="TraySwitch" Checked="Tray_Changed" Unchecked="Tray_Changed" />
+      </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="DarkTheme24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header><ui:TextBlock Text="Theme" /></ui:CardControl.Header>
+        <ComboBox x:Name="ThemeBox" MinWidth="160" SelectionChanged="Theme_Changed">
+          <ComboBoxItem Content="System" Tag="system" />
+          <ComboBoxItem Content="Light" Tag="light" />
+          <ComboBoxItem Content="Dark" Tag="dark" />
+        </ComboBox>
+      </ui:CardControl>
+
+      <ui:TextBlock FontTypography="BodyStrong" Text="About" Margin="0,24,0,8" />
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Icon><ui:SymbolIcon Symbol="Info24" /></ui:CardControl.Icon>
+        <ui:CardControl.Header>
+          <StackPanel>
+            <ui:TextBlock Text="No More DPI" />
+            <ui:TextBlock x:Name="AboutText" FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+          </StackPanel>
+        </ui:CardControl.Header>
+        <ui:Button x:Name="ProjectButton" Content="Project page" Click="Project_Click">
+          <ui:Button.Icon><ui:SymbolIcon Symbol="Open24" /></ui:Button.Icon>
+        </ui:Button>
+      </ui:CardControl>
+      <ui:CardAction Margin="0,0,0,4" Click="Uninstall_Click">
+        <ui:CardAction.Icon><ui:SymbolIcon Symbol="Delete24" /></ui:CardAction.Icon>
+        <StackPanel>
+          <ui:TextBlock Text="Uninstall No More DPI" />
+          <ui:TextBlock FontTypography="Caption" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                        Text="Removes the service, the tunnel adapter and the app, and puts your DNS and browser settings back" />
+        </StackPanel>
+      </ui:CardAction>
+    </StackPanel>
+  </ScrollViewer>
+</Page>
